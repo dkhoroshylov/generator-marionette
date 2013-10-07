@@ -191,6 +191,16 @@ Or you may want to inherit from another collection
 
 
 
+Create modules
+------------
+Creates a Marionette Module on the current application object and adds an
+initializer to the newly created module.
+
+    $ yo marionette:module module-name-here
+
+
+
+
 Create views
 ------------
 Backbone works with view definitions, to create one use this command. It is recommended to use Marionette views instead of the standard Backbone view
