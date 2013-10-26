@@ -1,1 +1,1 @@
-{{!empty <%= _.classify(name) %> template}}
+{{!empty <%= _.capitalize(name) %> template}}

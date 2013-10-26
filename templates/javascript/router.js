@@ -1,7 +1,7 @@
 define([
 	'backbone'
 ],
-function(<%= _.classify('backbone') %>){
+function(<%= _.capitalize('backbone') %>){
     'use strict';
 
 	return Backbone.Router.extend({

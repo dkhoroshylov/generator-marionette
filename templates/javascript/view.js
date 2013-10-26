@@ -1,12 +1,12 @@
 define([
 	'backbone'
 ],
-function(<%= _.classify('backbone') %>){
+function(<%= _.capitalize('backbone') %>){
     'use strict';
 
 	return Backbone.View.extend({
 		initialize: function() {
-			console.log("initialize a <%= _.classify(name) %> View");
+			console.log("initialize a <%= _.capitalize(name) %> View");
 		}
 	});
 });

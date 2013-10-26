@@ -2,13 +2,13 @@ define([
 	'backbone'<% if (!_.isEmpty(inherit)) { %>,
 	'controllers/<%= inherit %>'<% } %>
 ],
-function( <%= _.classify('backbone') %><% if (!_.isEmpty(inherit)) { %>, <%=_.classify(inherit)%><% } %> ) {
+function( <%= _.capitalize('backbone') %><% if (!_.isEmpty(inherit)) { %>, <%=_.capitalize(inherit)%><% } %> ) {
     'use strict';
 
-	return <% if (!_.isEmpty(inherit)) { %><%=_.classify(inherit)%>.extend <% } else { %>Backbone.Marionette.Controller.extend<% } %>({
+	return <% if (!_.isEmpty(inherit)) { %><%=_.capitalize(inherit)%>.extend <% } else { %>Backbone.Marionette.Controller.extend<% } %>({
 
 		initialize: function( options ) {
-			console.log("initialize a <%= _.classify(name) %> Controller");
+			console.log("initialize a <%= _.capitalize(name) %> Controller");
 		}
 	});
 
