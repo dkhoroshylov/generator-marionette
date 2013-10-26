@@ -14,7 +14,7 @@ function Generator() {
   this.argument('inherit', { type: String, required: false });
 
   this.option('create-all', { desc: 'Create a new model for this collection' });
-  
+
 
   /* set the template name which is auto created */
   this.tmplOrig = this.name;
@@ -26,8 +26,8 @@ function Generator() {
   }
 
   // invoke  mocha
-  this.hookFor('mocha-amd', { 
-    as: 'unitTest', 
+  this.hookFor('mocha-amd', {
+    as: 'unitTest',
     args: [this.name, 'itemview', 'views/item']
   });
 }

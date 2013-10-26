@@ -27,5 +27,5 @@ Generator.prototype.createControllerFiles = function createControllerFiles() {
   var ext = 'js';
   var baseDir = validDir.getValidatedFolder( 'app/' );
   
-  this.template('controller.' + ext, path.join(baseDir + 'scripts/controllers', this.name + '.' + ext));
+  this.template('controller.ejs', path.join(baseDir + 'scripts/controllers', this.name + '.' + ext));
 };

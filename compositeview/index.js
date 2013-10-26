@@ -10,7 +10,13 @@
 var generator = require('yeoman-generator'),
 	util = require('util'),
 	path = require('path'),
-	validDir = require('../helpers/validateDirectory');
+	validDir = require('../helpers/validateDirectory'),
+    stringHelpers = require('../helpers/stringHelpers'),
+    _ = require('lodash'),
+    _s = require('underscore.string');
+
+// Extend lodash for our purposes
+_.mixin(_s.exports());
 
 // Export our Generator
 module.exports = Generator;
@@ -66,8 +72,54 @@ util.inherits(Generator, generator.NamedBase);
 
 // Creates composite view files
 Generator.prototype.createCompositeViewFiles = function createCompositeViewFiles() {
-	var baseDir = validDir.getValidatedFolder('app/');
-	this.template('compositeview.js',
+	var baseDir = validDir.getValidatedFolder('app/'),
+        deps = ['backbone'],
+        funcs = ['Backbone'],
+        extendFrom = 'Backbone.Marionette.CompositeView',
+        itemViewAndTemplateSection = '';
+
+    // -------------------------------------------------------------
+    // Build dependencies list as a string along with functions list
+    // -------------------------------------------------------------
+
+    // ItemView
+    if (!_.isEmpty(this.itemview)) {
+        deps.push ('views/item' + this.itemview);
+        funcs.push(_.capitalize(this.itemview));
+        itemViewAndTemplateSection += '\n        itemView: '
+            + _.capitalize(this.itemview) + ',';
+    }
+
+    // Composite View's template
+    if (!_.isEmpty(this.compTmplLocation)) {
+        deps.push('hbs!tmpl/' + this.compTmplLocation + '/'
+            + stringHelpers.toDashSeparated(this.compTmpl));
+        funcs.push(stringHelpers.lcaseFirst(
+            _.capitalize(this.compTmpl)) + 'Tmpl');
+        itemViewAndTemplateSection += '\n        template: '
+            + stringHelpers.lcaseFirst(
+                _.capitalize(this.compTmpl)) + 'Tmpl,';
+    }
+
+    // Composite View inherited from
+    if (!_.isEmpty(this.inherit)) {
+        deps.push('views/composite/' + this.inherit);
+        funcs.push(_.capitalize(this.inherit));
+        extendFrom = _.capitalize(this.inherit);
+    }
+
+    // Get dependencies and functions list for template
+    deps = stringHelpers.buildDepsList(deps);
+    funcs = stringHelpers.buildFuncsList(funcs);
+
+    // Compile and generate template
+	this.template('compositeview.ejs',
 		path.join(baseDir + 'scripts/views/composite',
-			this.name + '.js'));
+			this.name + '.js'), {
+            name: this.name,
+            depsList: deps,
+            funcsList: funcs,
+            itemViewAndTemplateSection: itemViewAndTemplateSection,
+            extendFrom: extendFrom
+        });
 };

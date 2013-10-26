@@ -36,5 +36,5 @@ Generator.prototype.createCollectionViewFiles = function createCollectionViewFil
   var ext = 'js';
   var baseDir = validDir.getValidatedFolder( 'app/' );
   
-  this.template('collectionview.' + ext, path.join(baseDir + 'scripts/views/collection', this.name + '.' + ext));
+  this.template('collectionview.ejs', path.join(baseDir + 'scripts/views/collection', this.name + '.' + ext));
 };

@@ -38,5 +38,5 @@ Generator.prototype.createLayoutFiles = function createLayoutFiles() {
   var ext = 'js';
   var baseDir = validDir.getValidatedFolder( 'app/' );
 
-  this.template('layout.' + ext, path.join(baseDir + 'scripts/views/layout', this.name + '.' + ext));
+  this.template('layout.ejs', path.join(baseDir + 'scripts/views/layout', this.name + '.' + ext));
 };
