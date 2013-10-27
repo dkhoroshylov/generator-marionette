@@ -19,6 +19,6 @@ var ScaffoldingconfigGenerator = module.exports =
 util.inherits(ScaffoldingconfigGenerator, yeoman.generators.NamedBase);
 
 ScaffoldingconfigGenerator.prototype.files = function files() {
-    this.copy('scaffolding.json', 'yeoman-scaffolding.json');
+    this.copy('scaffolding.json', 'scaffolding.json');
 };
 
