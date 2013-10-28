@@ -6,7 +6,7 @@ function(<%= _.capitalize('backbone') %>){
 
 	return Backbone.View.extend({
 		initialize: function() {
-			console.log("initialize a <%= _.capitalize(name) %> View.");
+			console.log("initialize a <%= _.capitalize(name) %> View");
 		}
 	});
 });

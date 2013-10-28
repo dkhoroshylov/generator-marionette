@@ -1,21 +1,26 @@
 /*jshint latedef:false */
 
+/**
+ * tmpl/index.js
+ * Generates view template files in the appropriate directory with
+ * the appropriate file extension.
+ */
+
 // Preliminaries
 var generator = require('yeoman-generator'),
 	util = require('util'),
 	path = require('path'),
 	validDir = require('../helpers/validateDirectory'),
-	stringHelpers = require('../helpers/stringHelpers');
+	_ = require('underscore.string/dist/underscore.string.min');
 
 // Export our Generator
 module.exports = Generator;
 
-/**
- * Generates view template files in the appropriate directory with
- * the appropriate file extension and a dashed separated naming schema.
- * @constructor
- */
+// Our Generator
 function Generator() {
+
+	// Used for file naming convention
+	var startsWithDash;
 
 	// Apply generator named base
 	generator.NamedBase.apply(this, arguments);
@@ -36,22 +41,35 @@ function Generator() {
 	// Make sure the file extension has a value
 	this.fileExtension = this.fileExtension || '.hbs';
 
-    // Dash separate the name to use for the template file name
-    // if no dashes present
-    if (!/\-+/.test(this.name)) {
-        this.name = stringHelpers.toDashSeparated(this.name);
-    }
+	// `File name` value
+	// Force dash separated naming convention for view template files.
+
+	// Contains dashes
+	if (!/\-+/.test(this.name)) {
+		this.name = _.dasherize(this.name);
+
+		// Make sure dasherize doesn't generate dash in first position
+		if (/^\-/.test(this.name)) {
+			startsWithDash = true;
+			do {
+				if (!/^\-/.test(this.name)) {
+					startsWithDash = false;
+				}
+				else {
+					this.name = this.name.substr(1, this.name.length);
+				}
+			}
+			while (startsWithDash);
+		}
+	}
 }
 
 // Inheirt generator `Named Base`
 util.inherits(Generator, generator.NamedBase);
 
-/**
- * Create template files callback.
- * @return {void}
- */
+// Create template files callback
 Generator.prototype.createTmplFiles = function createTmplFiles() {
 	var baseDir = validDir.getValidatedFolder('app/');
-	this.template('tmpl.ejs', path.join(baseDir + 'templates',
+	this.template('tmpl.js', path.join(baseDir + 'templates',
 		this.tmplLocation, this.name + this.fileExtension));
 };

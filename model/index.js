@@ -29,5 +29,5 @@ Generator.prototype.createModelFiles = function createModelFiles() {
   var ext = 'js';
   var baseDir = validDir.getValidatedFolder( 'app/' );
   
-  this.template('model.ejs', path.join(baseDir + 'scripts/models', this.name + '.' + ext));
+  this.template('model.' + ext, path.join(baseDir + 'scripts/models', this.name + '.' + ext));
 };

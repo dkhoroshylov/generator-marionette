@@ -1,6 +1,6 @@
 define([
 	'backbone'<% if (!_.isEmpty(tmpl)) { %>,
-	'hbs!tmpl/<% if (!_.isEmpty(tmplLocation)) { %><%= tmplLocation%>/<% } %><%= _.dasherize(tmpl) %>'<% } %><% if (!_.isEmpty(inherit)) { %>,
+	'hbs!tmpl/<% if (!_.isEmpty(tmplLocation)) { %><%= tmplLocation%>/<% } %><%= tmpl %>'<% } %><% if (!_.isEmpty(inherit)) { %>,
 	'views/layout/<%= inherit %>'<% } %>
 ],
 function( <%= _.capitalize('backbone') %><% if (!_.isEmpty(tmpl)) { %>, <%= _.capitalize(tmpl) %> <% } %><% if (!_.isEmpty(inherit)) { %>, <%=_.capitalize(inherit)%><% } %> ) {

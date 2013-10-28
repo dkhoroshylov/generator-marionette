@@ -1,11 +1,6 @@
 generator-marionette
 ======================
 
-WARNING!!!
-===========================
-This repo is undergoing restructuring/re-architechting 10/26/2013
-Take commits from today at your own risk!
-
 Yeoman generator for Express, Marionette and Backbone with AMD
 
 Stack

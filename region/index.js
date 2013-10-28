@@ -27,5 +27,5 @@ Generator.prototype.createRegionFiles = function createRegionFiles() {
   var ext = 'js';
   var baseDir = validDir.getValidatedFolder( 'app/' );
 
-  this.template('region.ejs', path.join(baseDir + 'scripts/regions', this.name + '.' + ext));
+  this.template('region.' + ext, path.join(baseDir + 'scripts/regions', this.name + '.' + ext));
 };

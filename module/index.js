@@ -31,6 +31,6 @@ Generator.prototype.createModuleFiles = function createModuleFiles() {
 		fs.mkdir(baseDir + 'scripts/modules');
 	}
 
-  this.template('module.ejs', path.join(baseDir
+  this.template('module.' + ext, path.join(baseDir
       + 'scripts/modules', this.name + '.' + ext));
 };

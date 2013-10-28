@@ -26,5 +26,5 @@ Generator.prototype.createRouterFiles = function createRouterFiles() {
   var ext = 'js';
   var baseDir = validDir.getValidatedFolder( 'app/' );
 
-  this.template('router.ejs', path.join(baseDir + 'scripts/routers', this.name + '.' + ext));
+  this.template('router.' + ext, path.join(baseDir + 'scripts/routers', this.name + '.' + ext));
 };
