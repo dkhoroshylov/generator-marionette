@@ -60,7 +60,7 @@
         }
     },
     "viewTemplate": {
-        "dirName": "view-templates",
+        "dirName": "templates",
         "templateSuffix": "-view",
         "templateExtension": ".hbs"
     }
