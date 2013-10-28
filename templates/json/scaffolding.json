@@ -56,4 +56,5 @@
         "templateSuffix": "-view",
         "templateExtension": ".hbs"
     }
+
 }

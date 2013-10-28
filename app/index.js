@@ -1,18 +1,13 @@
 var util = require('util'),
     path = require('path'),
-    fs = require('fs'),
     yeoman = require('yeoman-generator'),
-    chalk = require('chalk'),
-    _ = require('lodash');
+    chalk = require('chalk');
 
 module.exports = Generator;
 
 function Generator(args, options, config) {
     yeoman.generators.Base.apply(this, arguments);
 
-    this.appDir = '';
-    this.appNeedsServer = false;
-    this.use
     this.scaffoldFileName = 'scaffolding.json';
     this.testFramework = 'mocha-amd';
     this.templateFramework = 'handlebars';
@@ -30,19 +25,18 @@ util.inherits(Generator, yeoman.generators.Base);
 
 Generator.prototype.askFor = function askFor() {
     var callback = this.async(),
-        prompts = null,
 
     // welcome message
-        welcome =
-            '\n     _-----_' +
-                '\n    |       |' +
-                '\n    |' + chalk.red('--(o)--') + '|   .--------------------------.' +
-                '\n   `---------´  |    ' + chalk.yellow.bold('Welcome to Yeoman') + ',    |' +
-                '\n    ' + chalk.yellow('(') + ' _' + chalk.yellow('´U`') + '_ ' + chalk.yellow(')') + '   |   ' + chalk.yellow.bold('ladies and gentlemen!') + '  |' +
-                '\n    /___A___\\   \'__________________________\'' +
-                '\n     ' + chalk.yellow('|  ~  |') +
-                '\n   __' + chalk.yellow('\'.___.\'') + '__' +
-                '\n ´   ' + chalk.red('`  |') + '° ' + chalk.red('´ Y') + ' `\n';
+    welcome =
+    '\n     _-----_' +
+    '\n    |       |' +
+    '\n    |' + chalk.red('--(o)--') + '|   .--------------------------.' +
+    '\n   `---------´  |    ' + chalk.yellow.bold('Welcome to Yeoman') + ',    |' +
+    '\n    ' + chalk.yellow('(') + ' _' + chalk.yellow('´U`') + '_ ' + chalk.yellow(')') + '   |   ' + chalk.yellow.bold('ladies and gentlemen!') + '  |' +
+    '\n    /___A___\\   \'__________________________\'' +
+    '\n     ' + chalk.yellow('|  ~  |') +
+    '\n   __' + chalk.yellow('\'.___.\'') + '__' +
+    '\n ´   ' + chalk.red('`  |') + '° ' + chalk.red('´ Y') + ' `\n',
 
 
     console.log(welcome);
@@ -50,67 +44,54 @@ Generator.prototype.askFor = function askFor() {
         'jQuery, Backbone.js, Marionette, Handlebars, ' +
         'Require and Modernizr.');
 
-    // If scaffold.json exists ask user what to do
-    if (fs.existsSync(this.scaffoldFileName)) {
-        return;
-    }
-
 
     prompts = [
         {
             type: 'string',
-            name: 'appDir',
+            name: 'publicDir',
             message: 'Is your application going to live within a ' +
                 'public directory (app/htdocs/public etc.)?  ' +
-                'If yes enter the directory path now:',
-            default: ''
+                'If yes enter it\'s path now (relative to current path):'
         },
         {
             type: 'confirm',
-            name: 'appNeedsServer',
-            message: 'Will your appliaction need a nodejs server ' +
-                '(will include expressjs if yes)?',
-            default: false
+            name: 'useMongoose',
+            message: 'Would you like to include MongoDB for storage?'
+        },
+        {
+            type: 'confirm',
+            name: 'useSocketIO',
+            message: 'Would you like to include Socket IO for real time communication?'
+        },
+        {
+            type: 'confirm',
+            name: 'useBaucis',
+            message: 'Would you like to include Baucis for REST?'
         },
         {
             type: 'string',
             name: 'bowerDirectory',
-            message: 'Where would you like you\'re Bower Components installed?',
+            message: 'Where do you want the Bower components installed?',
             default: 'bower_components'
         }
     ];
 
     this.prompt(prompts, function (props) {
-        _.extend(this, props);
+        // manually deal with the response, get back and store the results.
+        // we change a bit this way of doing to automatically do this in the self.prompt() method.
+        this.isFullApp = props.isFullApp;
+        this.useMongoose = props.useMongoose;
+        this.useSocketIO = props.useSocketIO;
+        this.useBaucis = props.useBaucis;
+        this.bowerDirectory = props.bowerDirectory;
+
+        //dummy vars for legacy
+        this.compassBootstrap = true;
+        this.includeRequireJS = true;
+
         callback();
     }.bind(this));
-}
-
-
-Generator.prototype.askAboutServer = function asAboutServer() {
-    var cb = this.async();
-    this.prompt({
-            type: 'confirm',
-            name: 'useMongoose',
-            message: 'Would you like to include MongoDB for storage?',
-            default: false
-        },
-        {
-            type: 'confirm',
-            name: 'useSocketIO',
-            message: 'Would you like to include Socket IO for real time communication?',
-            default: false
-        },
-        {
-            type: 'confirm',
-            name: 'useBaucis',
-            message: 'Would you like to include Baucis for REST?',
-            default: false
-        }, function (props) {
-            cb();
-        });
 };
-
 
 Generator.prototype.git = function git() {
     if (this.isFullApp) {
@@ -163,7 +144,7 @@ Generator.prototype.bootstrapJs = function bootstrapJs() {
 };
 
 Generator.prototype.setupEnv = function setupEnv() {
-    var _rootDir = this.isFullApp ? 'app' : '';
+    var _rootDir = this.publicDir;
 
     // templates
     this.mkdir(_rootDir + 'templates');
