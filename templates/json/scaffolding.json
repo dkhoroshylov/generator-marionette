@@ -1,19 +1,11 @@
 {
     "isFullApp": false,
-
     "useMongoose": false,
     "useBaucis": false,
-
-    "compassBootstrap": false,
-    "includeRequireJS": false,
-
     "bowerDirectory": "bower_components",
-
-    "app": {
-        "path": "",
-        "isModular": false,
-        "scriptsDirName": "scripts",
-        "needsServer": false
+    "isModularApp": false,
+    "application": {
+        "dirName": "app"
     },
     "controller": {
         "dirName": "controllers",

@@ -10,231 +10,189 @@ module.exports = Generator;
 function Generator(args, options, config) {
     yeoman.generators.Base.apply(this, arguments);
 
-    // Other vars
-    this.usingScaffoldingJson = false;
-    this.scaffoldingFileName = 'scaffolding.json';
+    this.appDir = '';
+    this.appNeedsServer = false;
+    this.use
+    this.scaffoldFileName = 'scaffolding.json';
     this.testFramework = 'mocha-amd';
     this.templateFramework = 'handlebars';
 
-    // Extend this with the options from the scaffolding.json file
-    _.extend(this, JSON.parse(this.readFileAsString(
-        path.join(__dirname, '..', 'templates',
-            'json', this.scaffoldingFileName))
-    ));
-
     this.hookFor(this.testFramework, { as: 'app' });
 
-//    this.on('end', function () {
-//        if (['app', 'backbone', 'marionette'].indexOf(this.generatorName) >= 0) {
-//            this.installDependencies({ skipInstall: this.options['skip-install'] });
-//        }
-//    });
+    this.on('end', function () {
+        if (['app', 'backbone', 'marionette'].indexOf(this.generatorName) >= 0) {
+            this.installDependencies({ skipInstall: this.options['skip-install'] });
+        }
+    });
 }
 
 util.inherits(Generator, yeoman.generators.Base);
 
-Generator.prototype.intro = function intro() {
+Generator.prototype.askFor = function askFor() {
+    var callback = this.async(),
+        prompts = null,
+
     // welcome message
-    welcome =
-        '\n     _-----_' +
-            '\n    |       |' +
-            '\n    |' + chalk.red('--(o)--') + '|   .--------------------------.' +
-            '\n   `---------´  |    ' + chalk.yellow.bold('Welcome to Yeoman') + ',    |' +
-            '\n    ' + chalk.yellow('(') + ' _' + chalk.yellow('´U`') + '_ ' + chalk.yellow(')') + '   |   ' + chalk.yellow.bold('ladies and gentlemen!') + '  |' +
-            '\n    /___A___\\   \'__________________________\'' +
-            '\n     ' + chalk.yellow('|  ~  |') +
-            '\n   __' + chalk.yellow('\'.___.\'') + '__' +
-            '\n ´   ' + chalk.red('`  |') + '° ' + chalk.red('´ Y') + ' `\n';
+        welcome =
+            '\n     _-----_' +
+                '\n    |       |' +
+                '\n    |' + chalk.red('--(o)--') + '|   .--------------------------.' +
+                '\n   `---------´  |    ' + chalk.yellow.bold('Welcome to Yeoman') + ',    |' +
+                '\n    ' + chalk.yellow('(') + ' _' + chalk.yellow('´U`') + '_ ' + chalk.yellow(')') + '   |   ' + chalk.yellow.bold('ladies and gentlemen!') + '  |' +
+                '\n    /___A___\\   \'__________________________\'' +
+                '\n     ' + chalk.yellow('|  ~  |') +
+                '\n   __' + chalk.yellow('\'.___.\'') + '__' +
+                '\n ´   ' + chalk.red('`  |') + '° ' + chalk.red('´ Y') + ' `\n';
+
 
     console.log(welcome);
     console.log('Out of the box I include HTML5 Boilerplate, ' +
         'jQuery, Backbone.js, Marionette, Handlebars, ' +
         'Require and Modernizr.');
-};
-
-Generator.prototype.scaffoldingJson = function scaffoldingJson() {
-    var cb = this.async();
 
     // If scaffold.json exists ask user what to do
-    if (fs.existsSync(this.scaffoldingFileName)) {
-        this.prompt([
-            {
-                type: 'confirm',
-                name: 'usingScaffoldingJson',
-                message: 'A scaffolding.json file has been found.  ' +
-                    'Would you like to continue using the ' +
-                    'scaffolding.json file?',
-                default: true
-            }
-        ],
-            function (props) {
-                _.extend(this, props);
-                cb();
-            }.bind(this));
+    if (fs.existsSync(this.scaffoldFileName)) {
         return;
     }
 
-    this.prompt([
+
+    prompts = [
         {
-            type: 'list',
-            name: 'mode',
-            message: 'Choose mode:',
-            choices: [
-                {name: 'Interactive', value: 'interactive'},
-                {name: 'scaffolding.json', value: 'use-json-file'}
-            ]
-        }
-    ],
-    function (props) {
-        if (props.mode.value === 'use-json-file') {
-            this.usingScaffoldingJson = true;
-            this.copy(
-                path.join(
-                    __dirname, '..', 'templates', 'json', 'scaffolding.json'
-                ),
-                'scaffolding.json');
-        }
-        cb();
-    }.bind(this));
-};
-
-Generator.prototype.askFor = function askFor() {
-    if (this.usingScaffoldingJson) {
-        return;
-    }
-    var cb = this.async(),
-        prompts = null;
-
-    prompts = [{
             type: 'string',
-            name: 'appPath',
+            name: 'appDir',
             message: 'Is your application going to live within a ' +
                 'public directory (app/htdocs/public etc.)?  ' +
-                'If yes enter the path now:',
+                'If yes enter the directory path now:',
             default: ''
         },
         {
             type: 'confirm',
             name: 'appNeedsServer',
             message: 'Will your appliaction need a nodejs server ' +
-                '(expressjs wil be included if answer is yes)?',
+                '(will include expressjs if yes)?',
             default: false
         },
         {
             type: 'string',
             name: 'bowerDirectory',
-            message: 'Where would you like you\'re Bower Components installed (in your app directory)?',
+            message: 'Where would you like you\'re Bower Components installed?',
             default: 'bower_components'
-        }];
+        }
+    ];
 
     this.prompt(prompts, function (props) {
         _.extend(this, props);
-        this.app.path = props.appPath;
-        this.app.needsServer = props.appNeedsServer;
-        if (this.app.needsServer) {
-            this.isFullApp = true;
-        }
-        cb();
+        callback();
     }.bind(this));
-};
+}
+
 
 Generator.prototype.askAboutServer = function asAboutServer() {
-    // Bail if not full app or using scaffolding json for options
-    if (!this.isFullApp || this.usingScaffoldingJson) {
-        return;
-    }
-
     var cb = this.async();
     this.prompt({
-        type: 'confirm',
-        name: 'useMongoose',
-        message: 'Would you like to include MongoDB for storage?',
-        default: false
-    },
-    {
-        type: 'confirm',
-        name: 'useSocketIO',
-        message: 'Would you like to include Socket IO for real time communication?',
-        default: false
-    },
-    {
-        type: 'confirm',
-        name: 'useBaucis',
-        message: 'Would you like to include Baucis for REST?',
-        default: false
-    },
-    function (props) {
-        _.extend(this, props);
-        cb();
-    });
+            type: 'confirm',
+            name: 'useMongoose',
+            message: 'Would you like to include MongoDB for storage?',
+            default: false
+        },
+        {
+            type: 'confirm',
+            name: 'useSocketIO',
+            message: 'Would you like to include Socket IO for real time communication?',
+            default: false
+        },
+        {
+            type: 'confirm',
+            name: 'useBaucis',
+            message: 'Would you like to include Baucis for REST?',
+            default: false
+        }, function (props) {
+            cb();
+        });
 };
 
-Generator.prototype.copyConfigFiles = function git() {
+
+Generator.prototype.git = function git() {
     if (this.isFullApp) {
         this.template('gitignore', '.gitignore');
         this.copy('gitattributes', '.gitattributes');
-        this.copy('jshintrc', '.jshintrc');
-        this.copy('editorconfig', '.editorconfig');
     }
+};
+
+Generator.prototype.bower = function bower() {
     this.template('bowerrc', '.bowerrc');
-    this.template('Gruntfile.js');
-    this.template('_package.json', 'package.json');
     this.copy('_bower.json', 'bower.json');
 };
 
-Generator.prototype.bootsrapJs = function bootsrap() {
+Generator.prototype.jshint = function jshint() {
     if (this.isFullApp) {
-        if (this.compassBootstrap) {
-            this.write('app/styles/main.scss',
-                '@import \'sass-bootstrap/lib/bootstrap\';' +
-                    '\n\n.hero-unit {\n    margin: 50px auto 0 auto;' +
-                    '\n    width: 400px;\n}');
-        } else {
-            this.write('app/styles/main.css',
-                'body {\n    background: #fafafa;\n}' +
-                    '\n\n.hero-unit {\n    margin: 50px auto 0 auto;' +
-                    '\n    width: 300px;\n}');
-        }
-    }
-    var _rootDir = this.isFullApp ? 'app/' : '';
-
-    if (this.includeRequireJS && this.compassBootstrap) {
-        this.copy('bootstrap.js',
-            _rootDir + 'scripts/vendor/bootstrap.js');
+        this.copy('jshintrc', '.jshintrc');
     }
 };
 
-Generator.prototype.appBaseline = function appBaseline() {
-    var appPath = this.app.path,
-        scriptsPath = appPath + this.app.scriptsDirName,
-        templatesPath = appPath + this.viewTemplate.dirName;
-    this.mkdir(templatesPath);
-    this.mkdir(scriptsPath);
+Generator.prototype.editorConfig = function editorConfig() {
+    if (this.isFullApp) {
+        this.copy('editorconfig', '.editorconfig');
+    }
+};
+
+Generator.prototype.gruntfile = function gruntfile() {
+    this.template('Gruntfile.js');
+};
+
+Generator.prototype.packageJSON = function packageJSON() {
+    this.template('_package.json', 'package.json');
+};
+
+Generator.prototype.mainStylesheet = function mainStylesheet() {
+    if (this.isFullApp) {
+        if (this.compassBootstrap) {
+            this.write('app/styles/main.scss', '@import \'sass-bootstrap/lib/bootstrap\';\n\n.hero-unit {\n    margin: 50px auto 0 auto;\n    width: 400px;\n}');
+        } else {
+            this.write('app/styles/main.css', 'body {\n    background: #fafafa;\n}\n\n.hero-unit {\n    margin: 50px auto 0 auto;\n    width: 300px;\n}');
+        }
+    }
+};
+
+Generator.prototype.bootstrapJs = function bootstrapJs() {
+    var _rootDir = this.isFullApp ? 'app/' : '';
+
+    if (this.includeRequireJS && this.compassBootstrap) {
+        this.copy('bootstrap.js', _rootDir + 'scripts/vendor/bootstrap.js');
+    }
+};
+
+Generator.prototype.setupEnv = function setupEnv() {
+    var _rootDir = this.isFullApp ? 'app' : '';
 
     // templates
-    this.copy('app/welcome.hbs', templatesPath + '/welcome.hbs');
+    this.mkdir(_rootDir + 'templates');
+    this.copy('app/welcome.hbs', _rootDir + 'templates/welcome.hbs');
 
     //html
-    this.template('app/index.html', appPath + '/index.html');
+    this.template('app/index.html', _rootDir + 'index.html');
 
     // js
-    this.copy('app/main.js', scriptsPath + '/main.js');
-    this.template('app/init.js', scriptsPath + '/init.js');
-    this.copy('app/regionManager.js', scriptsPath + '/regionManager.js');
-    this.copy('app/application.js', scriptsPath + '/application.js');
-    this.copy('app/communicator.js', scriptsPath + '/communicator.js');
+    this.mkdir(_rootDir + 'scripts');
+    this.copy('app/main.js', _rootDir + 'scripts/main.js');
+    this.template('app/init.js', _rootDir + 'scripts/init.js');
+    this.copy('app/regionManager.js', _rootDir + 'scripts/regionManager.js');
+    this.copy('app/application.js', _rootDir + 'scripts/application.js');
+    this.copy('app/communicator.js', _rootDir + 'scripts/communicator.js');
 
     // other
     if (this.isFullApp) {
         // server
         this.mkdir('server');
         this.template('server/app.js', 'server/app.js');
-        this.mkdir(appPath + '/styles');
-        this.mkdir(appPath + '/images');
-        this.template('app/404.html', appPath + '/404.html');
-        this.template('app/favicon.ico', appPath + '/favicon.ico');
-        this.template('app/robots.txt', appPath + '/robots.txt');
-        this.copy('app/htaccess', appPath + '/.htaccess');
+
+        this.mkdir('app/styles');
+        this.mkdir('app/images');
+        this.template('app/404.html');
+        this.template('app/favicon.ico');
+        this.template('app/robots.txt');
+        this.copy('app/htaccess', 'app/.htaccess');
     }
+
 };
 
